@@ -11,14 +11,14 @@ import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
 
-@NamedQuery(name = "User.findUserByEmail", query = "select u from User u where u.email=:email")
+/*@NamedQuery(name = "User.findUserByEmail", query = "select u from User u where u.email=:email")
 @NamedQuery(name = "User.getAllUsers", query = "select new " +
         "project.wrapper.UserWrapper(u.id, u.firstName, u.lastName,u.contactNumber,u.email, u.status, u.address, u.role) " +
         "from User u where u.role='user'")
 @NamedQuery(name = "User.getAllEmailAdmins", query = "select u.email from User u where u.role='admin'")
 @NamedQuery(name = "User.getUserById", query = "select new " +
         "project.wrapper.UserWrapper(u.id, u.firstName, u.lastName,u.contactNumber,u.email, u.status, u.address, u.role) " +
-        "from User u where u.id=:id")
+        "from User u where u.id=:id")*/
 
 @Entity
 @DynamicUpdate
