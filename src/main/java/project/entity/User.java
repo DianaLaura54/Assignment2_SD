@@ -23,7 +23,7 @@ import java.io.Serializable;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "user")
+@Table(name = "users",schema = "cfr")
 public class User implements Serializable {
     private static final PasswordEncoder B_CRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
@@ -63,8 +63,6 @@ public class User implements Serializable {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "status")
-    private String status;
 
     @Pattern(regexp = "^(user|admin)$", message = "Role must be either 'user' or 'admin'")
     @Column(name = "role")
@@ -148,13 +146,6 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getRole() {
         return role;
@@ -164,14 +155,17 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    @PostPersist
-    public void postPersist() {
-        this.password = B_CRYPT_PASSWORD_ENCODER.encode(password);
+    @PrePersist
+    public void prePersist() {
+        // Only encode if not already encoded
+        if (this.password != null && !this.password.startsWith("$2a$")) {
+            this.password = B_CRYPT_PASSWORD_ENCODER.encode(this.password);
+        }
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "Users{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -179,7 +173,6 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", address='" + address + '\'' +
-                ", status='" + status + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

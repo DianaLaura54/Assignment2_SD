@@ -1,0 +1,13 @@
+<nav class="navbar">
+  <ul class="nav-menu">
+    <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+    <li *ngIf="isAdmin"><a routerLink="/users" routerLinkActive="active">Users</a></li>
+    <li *ngIf="isAdmin"><a routerLink="/customers" routerLinkActive="active">Customers</a></li>
+    <li><a routerLink="/trains" routerLinkActive="active">Trains</a></li>
+  </ul>
+  
+  <div class="nav-user">
+    <span class="user-email">{{ userEmail }}</span>
+    <button (click)="logout()" class="btn-logout">Logout</button>
+  </div>
+</nav>

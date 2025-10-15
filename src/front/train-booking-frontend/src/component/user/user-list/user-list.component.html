@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="header">
+    <h2>User Management</h2>
+  </div>
+  
+  <div *ngIf="loading" class="loading">Loading users...</div>
+  
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+  
+  <div class="table-container" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Contact</th>
+          <th>Role</th>
+
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.contactNumber }}</td>
+          <td>
+            <span [class]="user.role === 'admin' ? 'badge-admin' : 'badge-user'">
+              {{ user.role }}
+            </span>
+          </td>
+      
+          <td>
+            <button (click)="editUser(user.id!)" class="btn btn-edit">Edit</button>
+            <button (click)="deleteUser(user.id!)" class="btn btn-delete">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

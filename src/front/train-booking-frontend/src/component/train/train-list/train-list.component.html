@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="header">
+    <h2>Train Management</h2>
+    <button *ngIf="isAdmin" (click)="addTrain()" class="btn btn-primary">Add Train</button>
+  </div>
+  
+  <div *ngIf="loading" class="loading">Loading trains...</div>
+  
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+  
+  <div class="table-container" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
+  <tr>
+    <th>ID</th>
+    <th>Train Name</th>
+    <th>Customer</th>
+    <th>Departure</th>
+    <th>Arrival</th>
+    <th>Date</th>
+    <th>Price</th>
+    <th>Available Seats</th>  
+    <th>Actions</th>
+  </tr>
+</thead>
+<tbody>
+  <tr *ngFor="let train of trains">
+    <td>{{ train.id }}</td>
+    <td>{{ train.name }}</td>
+    <td>{{ train.customerName }}</td>
+    <td>{{ train.departure_time }}</td>
+    <td>{{ train.arrival_time }}</td>
+    <td>{{ getMonthName(train.month) }} {{ train.day }}</td>
+    <td>${{ train.price_ticket }}</td>
+    <td>
+      <span [class.text-danger]="train.nr_seats === 0">
+        {{ train.nr_seats }}  
+      </span>
+    </td>
+    <td>
+      <button 
+        *ngIf="!isAdmin && train.nr_seats > 0" 
+        (click)="bookTrain(train)" 
+        class="btn btn-success">
+        Book
+      </button>
+      
+
+      <ng-container *ngIf="isAdmin">
+        <button (click)="editTrain(train.id!)" class="btn btn-edit">Edit</button>
+        <button (click)="deleteTrain(train.id!)" class="btn btn-delete">Delete</button>
+      </ng-container>
+    </td>
+  </tr>
+</tbody>
+    </table>
+  </div>
+</div>

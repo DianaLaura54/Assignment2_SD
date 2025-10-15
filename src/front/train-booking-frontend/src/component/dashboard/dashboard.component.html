@@ -1,0 +1,30 @@
+<div class="dashboard-container">
+  <div class="welcome-section">
+    <h1>Train Booking System</h1>
+    <p class="user-info">Logged in as: <strong>{{ userEmail }}</strong> ({{ userRole }})</p>
+  </div>
+  
+  <div class="cards-grid">
+    <div class="dashboard-card" (click)="navigateTo('/users')" *ngIf="isAdmin">
+      <div class="card-icon"></div>
+      <h3>Manage Users</h3>
+      <p>View and manage system users</p>
+    </div>
+    
+    <div class="dashboard-card" (click)="navigateTo('/customers')" *ngIf="isAdmin">
+      <div class="card-icon"></div>
+      <h3>Manage Customers</h3>
+      <p>View and manage train customers</p>
+    </div>
+    
+    <div class="dashboard-card" (click)="navigateTo('/trains')">
+      <div class="card-icon"></div>
+      <h3>Manage Trains</h3>
+      <p>View and manage train schedules</p>
+    </div>
+  </div>
+</div>
+
+
+
+

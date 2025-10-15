@@ -46,63 +46,95 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-
         try {
             if (!validateSignUpMap(requestMap)) {
                 return UserUtils.getResponseEntity(UserConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
 
             User user = userRepository.findUserByEmail(requestMap.get("email"));
-            if (!Objects.isNull(user)) {
+            if (user != null) {
                 return UserUtils.getResponseEntity("Email already exists!", HttpStatus.BAD_REQUEST);
             }
 
             user = getUserFromMap(requestMap, false);
+            user.setPassword(passwordEncoder.encode(user.getPassword())); // ← ADD THIS
             userRepository.save(user);
             return UserUtils.getResponseEntity("Successfully Registered.", HttpStatus.OK);
         } catch (ConstraintViolationException ex) {
             StringBuilder errorMessage = new StringBuilder();
             ex.getConstraintViolations().forEach(violation -> {
                 if (errorMessage.length() > 0) {
-                    errorMessage.append(";");
+                    errorMessage.append("; ");
                 }
                 errorMessage.append("\n-> ").append(violation.getPropertyPath()).append(": ").append(violation.getMessage());
             });
+            log.error("Constraint violations: {}", errorMessage);
             return UserUtils.getResponseEntity(errorMessage.toString(), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            log.error("{}", ex);
-
+            log.error("An error occurred in signUp: ", ex);
         }
-
         return UserUtils.getResponseEntity(UserConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
         try {
-            // Authenticate the user
+            String email = requestMap.get("email");
+            String password = requestMap.get("password");
+
+            log.info("=== LOGIN DEBUG START ===");
+            log.info("Email from request: " + email);
+            log.info("Password length: " + (password != null ? password.length() : "null"));
+
+            // First, check if user exists
+            User user = userRepository.findUserByEmail(email);
+            if (user == null) {
+                log.error("User not found in database!");
+                return new ResponseEntity<String>("{\"message\":\"User not found\"}",
+                        HttpStatus.UNAUTHORIZED);
+            }
+
+            log.info("User found: " + user.getEmail());
+            log.info("User role: " + user.getRole());
+            log.info("Stored password (first 20 chars): " + user.getPassword().substring(0, 20));
+
+            // Manually test password match
+            boolean matches = passwordEncoder.matches(password, user.getPassword());
+            log.info("Manual password check matches: " + matches);
+
+            if (!matches) {
+                log.error("Password does not match! Authentication will fail.");
+            }
+
+            // Try Spring Security authentication
+            log.info("Attempting Spring Security authentication...");
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")));
+                    new UsernamePasswordAuthenticationToken(email, password));
+
+            log.info("Spring Security authentication result: " + auth.isAuthenticated());
 
             if (auth.isAuthenticated()) {
-                // Check if the admin allows that user (approved)
-                if (customerUsersDetailsService.getUserDetail().getStatus().equalsIgnoreCase("true")) {
-                    project.entity.User userDetail = customerUsersDetailsService.getUserDetail();
-                    return new ResponseEntity<String>("{\"token\":\"" + jwtUtil.generateToken(
-                            userDetail.getEmail(), userDetail.getRole() + "\"}"),
-                            HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<String>("{\"message\":\"" + "Wait for admin approval!",
-                            HttpStatus.BAD_REQUEST);
-                }
+                project.entity.User userDetail = customerUsersDetailsService.getUserDetail();
+                String token = jwtUtil.generateToken(userDetail.getEmail(), userDetail.getRole());
+                log.info("Token generated successfully!");
+                log.info("Token preview: " + token.substring(0, Math.min(30, token.length())) + "...");
+
+                return new ResponseEntity<String>("{\"token\":\"" + token + "\"}",
+                        HttpStatus.OK);
+            } else {
+                log.error("Authentication succeeded but isAuthenticated() returned false");
             }
+
         } catch (Exception ex) {
+            log.error("=== EXCEPTION DURING LOGIN ===");
+            log.error("Exception type: " + ex.getClass().getName());
+            log.error("Exception message: " + ex.getMessage());
             ex.printStackTrace();
-            log.error("{}", ex);
+            log.error("=== END EXCEPTION ===");
         }
 
-        return new ResponseEntity<String>("{\"token\":\"" + "Bad request\"}", HttpStatus.OK);
+        return new ResponseEntity<String>("{\"message\":\"Invalid credentials\"}",
+                HttpStatus.UNAUTHORIZED);
     }
 
     @Override
@@ -235,9 +267,10 @@ public class UserServiceImplementation implements UserService {
 
         user.setFirstName(requestMap.get("firstName"));
         user.setLastName(requestMap.get("lastName"));
+        user.setContactNumber(requestMap.get("contactNumber"));
         user.setEmail(requestMap.get("email"));
         user.setAddress(requestMap.get("address"));
-        user.setStatus("false");
+
 
         return user;
     }

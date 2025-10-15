@@ -6,20 +6,18 @@ public class UserWrapper {
     private String lastName;
     private String contactNumber;
     private String email;
-    private String status;
     private String address;
 
     private String role;
     public UserWrapper() {
     }
 
-    public UserWrapper(int id, String firstName, String lastName, String contactNumber, String email, String status, String address, String role) {
+    public UserWrapper(int id, String firstName, String lastName, String contactNumber, String email, String address, String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.contactNumber = contactNumber;
         this.email = email;
-        this.status = status;
         this.address = address;
         this.role = role;
     }
@@ -56,13 +54,7 @@ public class UserWrapper {
         this.contactNumber = contactNumber;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getAddress() {
         return address;

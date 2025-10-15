@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "customer")
+@Table(name = "customer",schema = "cfr")
 public class Customer implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

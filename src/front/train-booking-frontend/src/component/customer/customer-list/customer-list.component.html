@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="header">
+    <h2>Customer Management</h2>
+    <button (click)="addCustomer()" class="btn btn-primary">Add Customer</button>
+  </div>
+  
+  <div *ngIf="loading" class="loading">Loading customers...</div>
+  
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+  
+  <div class="table-container" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of customers">
+          <td>{{ customer.id }}</td>
+          <td>{{ customer.name }}</td>
+          <td>
+            <button (click)="editCustomer(customer.id!)" class="btn btn-edit">Edit</button>
+            <button (click)="deleteCustomer(customer.id!)" class="btn btn-delete">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="customers.length === 0">
+          <td colspan="3" class="text-center">No customers found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

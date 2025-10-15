@@ -62,17 +62,38 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
     public boolean isAdmin() {
-        String role = claims.get("role").toString().substring(0, 5);
-        logger.info(role);
-        return "admin".equalsIgnoreCase(role);
+        if (claims == null) {
+            logger.warn("Claims is null - treating as non-admin");
+            return false;
+        }
 
+        Object roleObj = claims.get("role");
+        if (roleObj == null) {
+            logger.warn("Role claim is null");
+            return false;
+        }
+
+        String role = roleObj.toString();
+        logger.info("Checking admin - role: " + role);
+        return "admin".equalsIgnoreCase(role);
     }
 
     public boolean isUser() {
-        String role = claims.get("role").toString().substring(0, 4);
+        if (claims == null) {
+            logger.warn("Claims is null - treating as non-user");
+            return false;  // Or true to block access
+        }
+
+        Object roleObj = claims.get("role");
+        if (roleObj == null) {
+            logger.warn("Role claim is null");
+            return true;  // Safer to block if role is missing
+        }
+
+        String role = roleObj.toString();
+        logger.info("Checking user - role: " + role);
         return "user".equalsIgnoreCase(role);
     }
-
     public String getCurrentUser() {
         return userName;
     }

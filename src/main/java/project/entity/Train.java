@@ -8,20 +8,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 
-
-/*@NamedQuery(name = "Train.getAllTrains", query = "select new project.wrapper.TrainWrapper(t.id, t.name,t.departure_time, t.arrival_time, t.price_ticket, t.day, t.month,t.nr_seats," +
-        " t.customer.id, t.customer.name,t.customer.student,t.customer.id_seat) from Train t")
-
-@NamedQuery(name = "Train.getTrainById", query = "select new project.wrapper.TrainWrapper(t.id, t.name,t.departure_time, t.arrival_time, t.price_ticket, t.day, t.month,t.nr_seats," +
-        " t.customer.id, t.customer.name,t.customer.student,t.customer.id_seat) from Train t where t.id=:id")
-
-@NamedQuery(name = "Train.getTrainsByCustomerId", query = "select new project.wrapper.TrainWrapper(t.id,t.name, t.departure_time, t.arrival_time, t.price_ticket, t.day, t.month,t.nr_seats," +
-        " t.customer.id, t.customer.name,t.customer.student,t.customer.id_seat) from Train t where t.customer.id=:id")
-*/
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "train")
+@Table(name = "train", schema = "cfr")
 public class Train implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,10 +20,11 @@ public class Train implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name="name")
+
+    @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_fk", nullable = false)
     private Customer customer;
 
@@ -42,21 +33,26 @@ public class Train implements Serializable {
 
     @Column(name = "arrival_time")
     private Time arrival_time;
+
     @Column(name = "price_ticket")
     private int price_ticket;
+
     @Column(name = "day")
     private int day;
+
     @Column(name = "month")
     private int month;
-    @Column(name = "nr_seats")
+
+    @Column(name = "nr_seats")  // Available seats (decreases on booking)
     private int nr_seats;
 
     public Train() {
     }
 
-    public Train(int id, String name,Time departure_time, Time arrival_time, int price_ticket, int day, int month, int nr_seats, Customer customer) {
+    public Train(int id, String name, Time departure_time, Time arrival_time,
+                 int price_ticket, int day, int month, int nr_seats, Customer customer) {
         this.id = id;
-        this.name=name;
+        this.name = name;
         this.departure_time = departure_time;
         this.arrival_time = arrival_time;
         this.price_ticket = price_ticket;
@@ -66,6 +62,7 @@ public class Train implements Serializable {
         this.customer = customer;
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -136,5 +133,34 @@ public class Train implements Serializable {
 
     public void setNr_seats(int nr_seats) {
         this.nr_seats = nr_seats;
+    }
+
+    // Helper method to book seats
+    public boolean bookSeats(int seatsToBook) {
+        if (nr_seats >= seatsToBook && seatsToBook > 0) {
+            nr_seats -= seatsToBook;
+            return true;
+        }
+        return false;
+    }
+
+    // Helper method to cancel booking and restore seats
+    public void cancelSeats(int seatsToCancel) {
+        nr_seats += seatsToCancel;
+    }
+
+    @Override
+    public String toString() {
+        return "Train{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", departure_time=" + departure_time +
+                ", arrival_time=" + arrival_time +
+                ", price_ticket=" + price_ticket +
+                ", day=" + day +
+                ", month=" + month +
+                ", nr_seats=" + nr_seats +
+                ", customer=" + (customer != null ? customer.getName() : null) +
+                '}';
     }
 }
