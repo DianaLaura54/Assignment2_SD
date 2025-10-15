@@ -1,8 +1,8 @@
 My application is a complete online train booking system for managing railway stations (like CFR Călători). It includes tables stored in PostgreSQL. Users can browse available trains and book seats, with the system automatically managing seat availability. Admins can perform CRUD operations on all entities, while regular users can view trains and manage their bookings. The application uses JWT authentication with role-based access control (admin/user). The backend was implemented using Spring Boot with JPA/Hibernate, and the frontend uses Angular with TypeScript, featuring strongly-typed interfaces, reactive forms, routing guards, and HTTP interceptors for secure API communication.
 
-Frontend:Angular, TypeScript
+Frontend: Angular, TypeScript
 
-Backend: Spring Boot, RESTful APIs, JWT authentication
+Backend: Spring Boot, JPA/Hibernate, RESTful APIs, JWT authentication
 
 Database: PostgreSQL
 
